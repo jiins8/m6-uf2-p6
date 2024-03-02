@@ -1,15 +1,20 @@
-import jakarta.persistence.Basic;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "DIRECTORS")
-public class Director extends Movie {
+public class Director {
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "id")
     private int id;
-    @Basic
+
     private String name;
+
+    @OneToMany(mappedBy = "director", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Movie> movie = new ArrayList<>();
 
     public int getId() {
         return id;
@@ -25,5 +30,13 @@ public class Director extends Movie {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public List<Movie> getMovie() {
+        return movie;
+    }
+
+    public void setMovie(List<Movie> movie) {
+        this.movie = movie;
     }
 }
