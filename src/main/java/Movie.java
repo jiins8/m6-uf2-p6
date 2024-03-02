@@ -1,18 +1,20 @@
-import jakarta.persistence.Basic;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 @Entity
+@Table(name = "PELICULES")
 public class Movie {
     @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private int id;
     @Basic
     private String title;
-
+    @ManyToOne
+    private Director director;
+    @ManyToOne
+    private Review review;
     public int getId() {
         return id;
     }
-
     public void setId(int id) {
         this.id = id;
     }
