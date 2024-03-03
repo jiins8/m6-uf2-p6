@@ -10,13 +10,13 @@ public class Movie {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "PELICULA_ID_GENERADOR")
     @SequenceGenerator(name = "PELICULA_ID_GENERADOR", sequenceName = "PELICULA_SEQ", allocationSize = 1)
-    @Column(name ="ID")
+    @Column(name = "ID")
     private int id;
 
     private String title;
 
     @ManyToOne
-    @JoinColumn(name = "director_id")
+    @JoinColumn(name = "director_id") //insertable = false, updatable = false)
     private Director director;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
@@ -25,6 +25,7 @@ public class Movie {
     public int getId() {
         return id;
     }
+
     public void setId(int id) {
         this.id = id;
     }
@@ -51,5 +52,34 @@ public class Movie {
 
     public void setReviews(List<Review> reviews) {
         this.reviews = reviews;
+    }
+
+    @PrePersist
+    public void ensureDirector() {
+        if (director != null && director.getId() != 0) {
+            return; // Director is already persisted, do nothing
+        }
+
+        EntityManager em = Persistence.createEntityManagerFactory("default").createEntityManager();
+        EntityTransaction transaction = em.getTransaction();
+
+        try {
+            transaction.begin();
+
+            if (director == null) {
+                director = new Director();
+                director.setName("Default Director");
+            }
+
+            em.persist(director);
+            transaction.commit();
+        } catch (Exception e) {
+            if (transaction != null && transaction.isActive()) {
+                transaction.rollback();
+            }
+            e.printStackTrace();
+        } finally {
+            em.close();
+        }
     }
 }
